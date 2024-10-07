@@ -1,0 +1,96 @@
+#include <iostream>
+#include <string>
+
+class Account {
+protected:
+    std::string accountHolderName;
+    int accountNumber;
+    double balance;
+
+public:
+    // Constructor
+    Account(std::string name, int number) {
+        accountHolderName = name;
+        accountNumber = number;
+        balance = 0.0; // Initial balance is zero
+    }
+
+    // Function to deposit money
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            std::cout << "Deposited: $" << amount << std::endl;
+        } else {
+            std::cout << "Invalid deposit amount!" << std::endl;
+        }
+    }
+
+    // Function to withdraw money
+    virtual void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            std::cout << "Withdrew: $" << amount << std::endl;
+        } else {
+            std::cout << "Invalid withdrawal amount!" << std::endl;
+        }
+    }
+
+    // Function to display account details
+    void displayAccountInfo() const {
+        std::cout << "Account Holder: " << accountHolderName << std::endl;
+        std::cout << "Account Number: " << accountNumber << std::endl;
+        std::cout << "Balance: $" << balance << std::endl;
+    }
+};
+
+class SavingsAccount : public Account {
+private:
+    double interestRate;
+
+public:
+    // Constructor
+    SavingsAccount(std::string name, int number, double rate) : Account(name, number) {
+        interestRate = rate;
+    }
+
+    // Function to apply interest to the balance
+    void applyInterest() {
+        double interest = balance * (interestRate / 100);
+        balance += interest;
+        std::cout << "Interest applied: $" << interest << std::endl;
+    }
+};
+
+class CurrentAccount : public Account {
+public:
+    // Constructor
+    CurrentAccount(std::string name, int number) : Account(name, number) {}
+
+    // Overriding withdraw method to allow overdraft
+    void withdraw(double amount) override {
+        if (amount > 0) {
+            balance -= amount;
+            std::cout << "Withdrew: $" << amount << std::endl;
+        } else {
+            std::cout << "Invalid withdrawal amount!" << std::endl;
+        }
+    }
+};
+
+int main() {
+    // Creating a Savings Account
+    SavingsAccount savings("Alice", 101, 5.0);
+    savings.deposit(1000);
+    savings.applyInterest();
+    savings.displayAccountInfo();
+
+    std::cout << std::endl;
+
+    // Creating a Current Account
+    CurrentAccount current("Bob", 102);
+    current.deposit(500);
+    current.withdraw(600); // Overdraft allowed
+    current.displayAccountInfo();
+
+    return 0;
+}
